@@ -12,6 +12,10 @@ namespace Persistence
             try
             {
                 var size = int.Parse(file.ReadLine() ?? string.Empty);
+                var machines = file.ReadLine()?
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(b => new Machine(double.Parse(b)))
+                    .ToArray();
                 var jobs = new Job[size];
                 for (var i = 0; i < size; i++)
                 {
@@ -19,11 +23,11 @@ namespace Persistence
                         .Split(' ', StringSplitOptions.RemoveEmptyEntries)
                         .Select(int.Parse)
                         .ToArray();
-                    if (jobParams == null || jobParams.Length != 4)
+                    if (jobParams == null || jobParams.Length != 2)
                         throw new FileFormatException($"Invalid file format, file={filePath}");
-                    jobs[i] = new Job(jobParams[0], jobParams[1], jobParams[2], jobParams[3]);
+                    jobs[i] = new Job(jobParams[0], jobParams[1]);
                 }
-                return new Instance(jobs);
+                return new Instance(machines, jobs);
             }
             catch (FormatException ex)
             {

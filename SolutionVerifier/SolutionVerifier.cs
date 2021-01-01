@@ -6,7 +6,7 @@ namespace SolutionVerifier
 {
     public class SolutionVerifier
     {
-        public int Verify(Instance instance, Solution solution)
+        public double Verify(Instance instance, Solution solution)
         {
             if (!ValidateIntegrity(solution))
             {
@@ -27,23 +27,30 @@ namespace SolutionVerifier
 
         private bool ValidateIntegrity(Solution solution)
         {
-            var size = solution.Size;
-            var set = solution.JobPermutation.ToHashSet();
+            var size = solution.Size.Sum();
+            var set = solution.JobPermutation
+                .SelectMany(p => p)
+                .ToHashSet();
             return set.Min() == 1 && set.Max() == size && set.Count == size;
         }
 
-        private int CalculateValue(Solution solution, Instance instance)
+        private double CalculateValue(Solution solution, Instance instance)
         {
-            var value = 0;
-            var clock = 0;
-            foreach (var jobIndex in solution.JobPermutation)
+            var value = 0.0;
+            for (var i = 0; i < instance.Machines.Length; i++)
             {
-                var job = instance.Jobs[jobIndex - 1];
-                clock = Math.Max(clock, job.Ready) + job.Duration;
-                if (clock > job.Deadline) value += job.Weight;
+                var jobPermutation = solution.JobPermutation[i];
+                var inverseSpeedFactor = 1.0 / instance.Machines[i].SpeedFactor;
+                var clock = 0.0;
+                foreach (var jobIndex in jobPermutation)
+                {
+                    var job = instance.Jobs[jobIndex - 1];
+                    clock = Math.Max(clock, job.Ready) + job.Duration * inverseSpeedFactor;
+                    value += clock - job.Ready;
+                }
             }
 
-            return value;
+            return value / instance.Size;
         }
     }
 }

@@ -1,16 +1,18 @@
-﻿namespace Domain
+﻿using System.Linq;
+
+namespace Domain
 {
     public readonly struct Solution
     {
-        public Solution(int value, int[] jobPermutation)
+        public Solution(double value, int[][] jobPermutation)
         {
             Value = value;
             JobPermutation = jobPermutation;
         }
 
-        public int Value { get; }
-        public int[] JobPermutation { get; }
+        public double Value { get; }
+        public int[][] JobPermutation { get; }
 
-        public int Size => JobPermutation.Length;
+        public int[] Size => JobPermutation.Select(p => p.Length).ToArray();
     }
 }

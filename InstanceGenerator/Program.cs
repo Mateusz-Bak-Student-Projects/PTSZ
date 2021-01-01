@@ -14,6 +14,8 @@ namespace InstanceGenerator
                 .AddCommandLine(args)
                 .Build();
 
+            PersistenceProperties.SetCultureInfo();
+
             var properties = new InstanceGeneratorProperties();
             configuration.Bind("InstanceGenerator", properties);
             var persistenceProperties = new PersistenceProperties();
@@ -32,7 +34,7 @@ namespace InstanceGenerator
 
                 if (properties.GenerateDummySolutions)
                 {
-                    var dummySolution = InstanceGenerator.GenerateDummySolution(instance.Size);
+                    var dummySolution = InstanceGenerator.GenerateDummySolution(instance.Size, properties.NumberOfMachines);
                     var solutionFileName = string.Format(properties.DummySolutionFile, instance.Size);
                     var solutionFilePath = Path.Join(persistenceProperties.SolutionDirectory, solutionFileName);
                     solutionWriter.Write(dummySolution, solutionFilePath);

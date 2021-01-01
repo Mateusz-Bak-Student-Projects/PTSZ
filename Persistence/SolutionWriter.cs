@@ -8,7 +8,10 @@ namespace Persistence
         {
             using var file = new System.IO.StreamWriter(filePath);
             file.WriteLine(solution.Value);
-            file.WriteLine(string.Join(' ', solution.JobPermutation));
+            foreach (var permutation in solution.JobPermutation)
+            {
+                file.WriteLine(string.Join(' ', permutation));
+            }
         }
     }
 }

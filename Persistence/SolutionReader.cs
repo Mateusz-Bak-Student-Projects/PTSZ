@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Domain;
 
@@ -11,12 +12,17 @@ namespace Persistence
             using var file = new System.IO.StreamReader(filePath);
             try
             {
-                var value = int.Parse(file.ReadLine() ?? string.Empty);
-                var jobPermutation = file.ReadLine()?
-                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(int.Parse)
-                    .ToArray();
-                return new Solution(value, jobPermutation);
+                var value = double.Parse(file.ReadLine() ?? string.Empty);
+                var jobPermutation = new List<int[]>();
+                while (!file.EndOfStream)
+                {
+                    var permutation = file.ReadLine()?
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(int.Parse)
+                        .ToArray();
+                    jobPermutation.Add(permutation);
+                }
+                return new Solution(value, jobPermutation.ToArray());
             }
             catch (FormatException ex)
             {

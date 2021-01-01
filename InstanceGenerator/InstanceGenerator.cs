@@ -16,9 +16,13 @@ namespace InstanceGenerator
             this.random = random;
         }
 
-        public static Solution GenerateDummySolution(int size)
+        public static Solution GenerateDummySolution(int size, int numberOfMachines)
         {
-            return new Solution(0, Enumerable.Range(1, size).ToArray());
+            var jobsPerMachine = size / numberOfMachines;
+            var permutation = Enumerable.Range(0, numberOfMachines)
+                .Select(machine => Enumerable.Range(machine * jobsPerMachine + 1, jobsPerMachine).ToArray())
+                .ToArray();
+            return new Solution(0, permutation);
         }
 
         public IEnumerable<Instance> GenerateAll()
@@ -27,28 +31,39 @@ namespace InstanceGenerator
             var instances = new Instance[count];
             for (var i = 0; i < count; i++)
             {
-                instances[i] = GenerateInstance(properties.InstanceSizes[i]);
+                instances[i] = GenerateInstance(properties.InstanceSizes[i], properties.NumberOfMachines);
             }
             return instances;
         }
 
-        public Instance GenerateInstance(int size)
+        public Instance GenerateInstance(int size, int numberOfMachines)
         {
+            var machines = new Machine[numberOfMachines];
+            machines[0] = new Machine(1.0);
+            for (var i = 1; i < numberOfMachines; i++)
+            {
+                machines[i] = GenerateMachine(size);
+            }
             var jobs = new Job[size];
             for (var i = 0; i < size; i++)
             {
                 jobs[i] = GenerateJob(size);
             }
-            return new Instance(jobs);
+            return new Instance(machines, jobs);
+        }
+
+        private Machine GenerateMachine(int instanceSize)
+        {
+            var speedFactor = properties.MachineSpeedDistribution.GenerateValue(random, instanceSize);
+            var roundedSpeedFactor = Math.Round(speedFactor, properties.MachineSpeedPrecision);
+            return new Machine(roundedSpeedFactor);
         }
 
         private Job GenerateJob(int instanceSize)
         {
             var duration = (int)properties.DurationDistribution.GenerateValue(random, instanceSize);
             var ready = (int)properties.ReadyTimeDistribution.GenerateValue(random, instanceSize);
-            var deadline = ready + (int)(duration * properties.DeadlineOffsetFactorDistribution.GenerateValue(random, instanceSize));
-            var weight = (int)properties.WeightDistribution.GenerateValue(random, instanceSize);
-            return new Job(duration, ready, deadline, weight);
+            return new Job(duration, ready);
         }
     }
 }

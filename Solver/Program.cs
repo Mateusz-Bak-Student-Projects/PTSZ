@@ -14,6 +14,8 @@ namespace Solver
                 .AddCommandLine(args)
                 .Build();
 
+            PersistenceProperties.SetCultureInfo();
+
             var properties = new SolverProperties();
             configuration.Bind("Solver", properties);
             var persistenceProperties = new PersistenceProperties();

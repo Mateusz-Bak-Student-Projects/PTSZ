@@ -14,6 +14,8 @@ namespace SolutionVerifier
                 .AddCommandLine(args)
                 .Build();
 
+            PersistenceProperties.SetCultureInfo();
+
             var properties = new SolutionVerifierProperties();
             configuration.Bind("SolutionVerifier", properties);
             var persistenceProperties = new PersistenceProperties();
